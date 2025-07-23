@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateCard } from "@/components/DateCard";
 import { AddDateDialog } from "@/components/AddDateDialog";
+import { ChassidDatesDialog } from "@/components/ChassidDatesDialog";
+import { SettingsDialog, SettingsState } from "@/components/SettingsDialog";
 import { FilterBar } from "@/components/FilterBar";
 import { CalendarView } from "@/components/CalendarView";
 import { Star, Calendar, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ChassidDate } from "@/data/chassidicDates";
 
 interface StoredDate {
   id: string;
@@ -21,6 +24,12 @@ interface StoredDate {
 
 const Index = () => {
   const { toast } = useToast();
+  const [settings, setSettings] = useState<SettingsState>({
+    calendarType: "gregorian",
+    language: "english",
+    isSignedIn: false
+  });
+  
   const [dates, setDates] = useState<StoredDate[]>([
     {
       id: "1",
@@ -69,12 +78,44 @@ const Index = () => {
   }, [filteredDates]);
 
   const handleAddDate = (dateData: any) => {
+    if (!settings.isSignedIn) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add dates to your collection.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const newDate: StoredDate = {
       id: Date.now().toString(),
       ...dateData,
       dateObject: new Date(dateData.gregorianDate)
     };
     setDates(prev => [...prev, newDate]);
+  };
+
+  const handleAddChassidDates = (chassidDates: ChassidDate[]) => {
+    if (!settings.isSignedIn) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add dates to your collection.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newDates: StoredDate[] = chassidDates.map(date => ({
+      id: `chassid-${Date.now()}-${Math.random()}`,
+      title: date.title,
+      hebrewDate: date.hebrewDate,
+      gregorianDate: new Date().toISOString().split('T')[0], // placeholder - would need proper conversion
+      category: date.category,
+      description: date.description,
+      dateObject: new Date() // placeholder - would need proper conversion
+    }));
+    
+    setDates(prev => [...prev, ...newDates]);
   };
 
   const handleEditDate = (id: string) => {
@@ -92,17 +133,25 @@ const Index = () => {
     });
   };
 
+  const isRtl = settings.language === "hebrew";
+
   return (
-    <div className="min-h-screen bg-gradient-background">
+    <div className={`min-h-screen bg-gradient-background ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
-            Chassidic Dates Manager
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Keep track of meaningful dates in your spiritual journey
-          </p>
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
+              {settings.language === "hebrew" ? "מנהל תאריכים חסידיים" : "Chassidic Dates Manager"}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              {settings.language === "hebrew" 
+                ? "עקבו אחר תאריכים משמעותיים במסע הרוחני שלכם"
+                : "Keep track of meaningful dates in your spiritual journey"
+              }
+            </p>
+          </div>
+          <SettingsDialog settings={settings} onSettingsChange={setSettings} />
         </div>
 
         {/* Main Content */}
@@ -121,7 +170,10 @@ const Index = () => {
           <TabsContent value="dashboard" className="space-y-6">
             {/* Add Date and Stats */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-              <AddDateDialog onAddDate={handleAddDate} />
+              <div className="flex gap-2">
+                <AddDateDialog onAddDate={handleAddDate} />
+                <ChassidDatesDialog onAddDates={handleAddChassidDates} />
+              </div>
               
               <div className="flex gap-4">
                 <Card className="shadow-card">
