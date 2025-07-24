@@ -56,7 +56,7 @@ export function ChassidDatesDialog({
   };
 
   const handleApplyChanges = () => {
-    // Get current existing chassidic date IDs
+    // Get current existing chassidic date IDs  
     const currentChassidicIds = new Set(
       existingDates
         .filter(date => date.category === "chassidic")
@@ -72,7 +72,7 @@ export function ChassidDatesDialog({
       selectedDates.has(date.id) && !currentChassidicIds.has(date.id)
     );
 
-    // Find dates to remove (existing but not selected)
+    // Find dates to remove (existing but not selected)  
     const dateIdsToRemove = existingDates
       .filter(date => {
         if (date.category !== "chassidic") return false;

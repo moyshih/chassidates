@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateCard } from "@/components/DateCard";
 import { AddDateDialog } from "@/components/AddDateDialog";
 import { ChassidDatesDialog } from "@/components/ChassidDatesDialog";
+import { EditDateDialog } from "@/components/EditDateDialog";
 import { SettingsDialog, SettingsState } from "@/components/SettingsDialog";
 import { FilterBar } from "@/components/FilterBar";
 import { CalendarView } from "@/components/CalendarView";
@@ -108,15 +109,22 @@ const Index = () => {
       return;
     }
 
-    const newDates: StoredDate[] = chassidDates.map(date => ({
-      id: `chassid-${Date.now()}-${Math.random()}`,
-      title: date.title,
-      hebrewDate: date.hebrewDate,
-      gregorianDate: new Date().toISOString().split('T')[0], // placeholder - would need proper conversion
-      category: date.category,
-      description: date.description,
-      dateObject: new Date() // placeholder - would need proper conversion
-    }));
+    const newDates: StoredDate[] = chassidDates.map(date => {
+      // For demo purposes, using current year. In real app, would convert Hebrew to Gregorian properly
+      const demoDate = new Date();
+      demoDate.setMonth(Math.floor(Math.random() * 12));
+      demoDate.setDate(Math.floor(Math.random() * 28) + 1);
+      
+      return {
+        id: `chassid-${Date.now()}-${Math.random()}`,
+        title: date.title,
+        hebrewDate: date.hebrewDate,
+        gregorianDate: demoDate.toISOString().split('T')[0],
+        category: date.category,
+        description: date.description,
+        dateObject: demoDate
+      };
+    });
     
     setDates(prev => [...prev, ...newDates]);
   };
@@ -125,11 +133,16 @@ const Index = () => {
     setDates(prev => prev.filter(date => !dateIds.includes(date.id)));
   };
 
-  const handleEditDate = (id: string) => {
-    toast({
-      title: "Edit feature",
-      description: "Edit functionality coming soon!"
-    });
+  const handleEditDate = (id: string, editedData: any) => {
+    setDates(prev => prev.map(date => 
+      date.id === id 
+        ? { 
+            ...date, 
+            ...editedData,
+            dateObject: new Date(editedData.gregorianDate)
+          }
+        : date
+    ));
   };
 
   const handleDeleteDate = (id: string) => {
@@ -229,18 +242,27 @@ const Index = () => {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {upcomingDates.map((date) => (
-                    <DateCard
-                      key={date.id}
-                      id={date.id}
-                      title={date.title}
-                      hebrewDate={date.hebrewDate}
-                      gregorianDate={new Date(date.gregorianDate).toLocaleDateString()}
-                      category={date.category}
-                      description={date.description}
-                      daysUntil={date.daysUntil}
-                      onEdit={handleEditDate}
-                      onDelete={handleDeleteDate}
-                    />
+                    <div key={date.id} className="space-y-2">
+                      <DateCard
+                        id={date.id}
+                        title={date.title}
+                        hebrewDate={date.hebrewDate}
+                        gregorianDate={new Date(date.gregorianDate).toLocaleDateString()}
+                        category={date.category}
+                        description={date.description}
+                        daysUntil={date.daysUntil}
+                        onEdit={() => {}} // Disable card edit button
+                        onDelete={handleDeleteDate}
+                      />
+                      {date.category === "personal" && (
+                        <div className="flex justify-end">
+                          <EditDateDialog
+                            dateData={date}
+                            onEditDate={handleEditDate}
+                          />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

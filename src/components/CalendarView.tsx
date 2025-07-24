@@ -106,6 +106,9 @@ export function CalendarView({ dates, language }: CalendarViewProps) {
               <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
+              <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+                {texts.today}
+              </Button>
             </div>
           </div>
         </CardHeader>
