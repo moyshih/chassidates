@@ -10,15 +10,15 @@ interface FilterBarProps {
 }
 
 const filterLabels = {
-  all: "All Dates",
+  all: "All",
   personal: "Personal",
-  chassidic: "Chassidic", 
+  chassidic: "Chassidic",
   community: "Community"
 };
 
 export function FilterBar({ activeFilter, onFilterChange, dateCount }: FilterBarProps) {
   const filters = Object.keys(filterLabels) as Array<keyof typeof filterLabels>;
-  
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -41,7 +41,7 @@ export function FilterBar({ activeFilter, onFilterChange, dateCount }: FilterBar
           ))}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-3 shrink-0">
         {activeFilter !== "all" && (
           <Button

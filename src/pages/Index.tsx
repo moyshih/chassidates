@@ -1,11 +1,9 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateCard } from "@/components/DateCard";
 import { AddDateDialog } from "@/components/AddDateDialog";
 import { ChassidDatesDialog } from "@/components/ChassidDatesDialog";
-import { EditDateDialog } from "@/components/EditDateDialog";
 import { SettingsDialog, SettingsState } from "@/components/SettingsDialog";
 import { FilterBar } from "@/components/FilterBar";
 import { CalendarView } from "@/components/CalendarView";
@@ -257,7 +255,7 @@ const Index = () => {
                         id={date.id}
                         title={date.title}
                         hebrewDate={date.hebrewDate}
-                        gregorianDate={new Date(date.gregorianDate).toLocaleDateString()}
+                        gregorianDate={date.dateObject}
                         category={date.category}
                         description={date.description}
                         daysUntil={date.daysUntil}

@@ -9,7 +9,7 @@ interface DateCardProps {
   id: string;
   title: string;
   hebrewDate: string;
-  gregorianDate: string;
+  gregorianDate: Date;
   category: "personal" | "chassidic" | "community";
   description?: string;
   daysUntil: number;
@@ -54,7 +54,7 @@ export function DateCard({
             <h3 className="font-semibold text-lg leading-tight">{title}</h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              <span>{gregorianDate}</span>
+              <span>{gregorianDate.toLocaleDateString()}</span>
               {hebrewDate && (
                 <>
                   <span>•</span>

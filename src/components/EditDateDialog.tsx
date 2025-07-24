@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 interface EditDateData {
   title: string;
   hebrewDate: string;
-  gregorianDate: string;
+  gregorianDate: Date;
   category: "personal" | "chassidic" | "community";
   description: string;
 }
@@ -34,7 +34,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.gregorianDate) {
       toast({
         title: "Missing information",
@@ -54,6 +54,10 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
 
   const handleInputChange = (field: keyof EditDateData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDateInputChange = (field: keyof EditDateData, date: string) => {
+    setFormData(prev => ({ ...prev, [field]: new Date(date) }));
   };
 
   return (
@@ -89,8 +93,8 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
             <Input
               id="edit-gregorian-date"
               type="date"
-              value={formData.gregorianDate}
-              onChange={(e) => handleInputChange("gregorianDate", e.target.value)}
+              value={formData.gregorianDate.toISOString().split("T")[0]}
+              onChange={(e) => handleDateInputChange("gregorianDate", e.target.value)}
             />
           </div>
 
