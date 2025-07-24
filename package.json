@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "homepage": "https://moshehalperin.github.io/chassidates/",
+  "homepage": "https://moyshih.github.io/chassidates/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
