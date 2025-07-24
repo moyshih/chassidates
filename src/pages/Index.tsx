@@ -11,6 +11,7 @@ import { CalendarView } from "@/components/CalendarView";
 import { Star, Calendar, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ChassidDate } from "@/data/chassidicDates";
+import { getTexts } from "@/lib/texts";
 
 interface StoredDate {
   id: string;
@@ -29,6 +30,8 @@ const Index = () => {
     language: "english",
     isSignedIn: false
   });
+  
+  const texts = getTexts(settings.language);
   
   const [dates, setDates] = useState<StoredDate[]>([
     {
@@ -118,6 +121,10 @@ const Index = () => {
     setDates(prev => [...prev, ...newDates]);
   };
 
+  const handleRemoveChassidDates = (dateIds: string[]) => {
+    setDates(prev => prev.filter(date => !dateIds.includes(date.id)));
+  };
+
   const handleEditDate = (id: string) => {
     toast({
       title: "Edit feature",
@@ -172,7 +179,12 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
               <div className="flex gap-2">
                 <AddDateDialog onAddDate={handleAddDate} />
-                <ChassidDatesDialog onAddDates={handleAddChassidDates} />
+                <ChassidDatesDialog 
+                  onAddDates={handleAddChassidDates}
+                  onRemoveDates={handleRemoveChassidDates}
+                  existingDates={dates}
+                  language={settings.language}
+                />
               </div>
               
               <div className="flex gap-4">
@@ -241,8 +253,12 @@ const Index = () => {
                 id: date.id,
                 title: date.title,
                 category: date.category,
-                date: date.dateObject
-              }))} 
+                date: date.dateObject,
+                description: date.description,
+                hebrewDate: date.hebrewDate,
+                gregorianDate: date.gregorianDate
+              }))}
+              language={settings.language}
             />
           </TabsContent>
         </Tabs>

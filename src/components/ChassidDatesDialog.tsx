@@ -1,21 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BookOpen, Plus } from "lucide-react";
+import { BookOpen, Plus, Minus } from "lucide-react";
 import { CHASSIDIC_DATES, ChassidDate } from "@/data/chassidicDates";
 import { useToast } from "@/hooks/use-toast";
+import { getTexts, Language } from "@/lib/texts";
+
+interface StoredDate {
+  id: string;
+  title: string;
+  category: "personal" | "chassidic" | "community";
+}
 
 interface ChassidDatesDialogProps {
   onAddDates: (dates: ChassidDate[]) => void;
+  onRemoveDates: (dateIds: string[]) => void;
+  existingDates: StoredDate[];
+  language: Language;
 }
 
-export function ChassidDatesDialog({ onAddDates }: ChassidDatesDialogProps) {
+export function ChassidDatesDialog({ 
+  onAddDates, 
+  onRemoveDates, 
+  existingDates, 
+  language 
+}: ChassidDatesDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const texts = getTexts(language);
+
+  // Sync selection with existing dates in the app
+  useEffect(() => {
+    const existingChassidicDates = existingDates
+      .filter(date => date.category === "chassidic")
+      .map(date => {
+        // Find matching chassidic date by title
+        const chassidDate = CHASSIDIC_DATES.find(cd => cd.title === date.title);
+        return chassidDate?.id;
+      })
+      .filter(Boolean) as string[];
+    
+    setSelectedDates(new Set(existingChassidicDates));
+  }, [existingDates, open]);
 
   const handleDateToggle = (dateId: string) => {
     const newSelected = new Set(selectedDates);
@@ -27,25 +55,48 @@ export function ChassidDatesDialog({ onAddDates }: ChassidDatesDialogProps) {
     setSelectedDates(newSelected);
   };
 
-  const handleAddSelected = () => {
-    const datesToAdd = CHASSIDIC_DATES.filter(date => selectedDates.has(date.id));
-    if (datesToAdd.length === 0) {
-      toast({
-        title: "No dates selected",
-        description: "Please select at least one date to add.",
-        variant: "destructive"
-      });
-      return;
+  const handleApplyChanges = () => {
+    // Get current existing chassidic date IDs
+    const currentChassidicIds = new Set(
+      existingDates
+        .filter(date => date.category === "chassidic")
+        .map(date => {
+          const chassidDate = CHASSIDIC_DATES.find(cd => cd.title === date.title);
+          return chassidDate?.id;
+        })
+        .filter(Boolean) as string[]
+    );
+
+    // Find dates to add (selected but not existing)
+    const datesToAdd = CHASSIDIC_DATES.filter(date => 
+      selectedDates.has(date.id) && !currentChassidicIds.has(date.id)
+    );
+
+    // Find dates to remove (existing but not selected)
+    const dateIdsToRemove = existingDates
+      .filter(date => {
+        if (date.category !== "chassidic") return false;
+        const chassidDate = CHASSIDIC_DATES.find(cd => cd.title === date.title);
+        return chassidDate && !selectedDates.has(chassidDate.id);
+      })
+      .map(date => date.id);
+
+    // Apply changes
+    if (datesToAdd.length > 0) {
+      onAddDates(datesToAdd);
+    }
+    if (dateIdsToRemove.length > 0) {
+      onRemoveDates(dateIdsToRemove);
     }
 
-    onAddDates(datesToAdd);
-    setSelectedDates(new Set());
     setOpen(false);
     
-    toast({
-      title: "Dates added successfully",
-      description: `Added ${datesToAdd.length} chassidic date${datesToAdd.length > 1 ? 's' : ''} to your collection.`
-    });
+    if (datesToAdd.length > 0 || dateIdsToRemove.length > 0) {
+      toast({
+        title: texts.datesAddedSuccess,
+        description: `Updated ${datesToAdd.length + dateIdsToRemove.length} chassidic dates in your collection.`
+      });
+    }
   };
 
   return (
@@ -53,69 +104,49 @@ export function ChassidDatesDialog({ onAddDates }: ChassidDatesDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" className="bg-gradient-accent hover:opacity-90">
           <BookOpen className="w-4 h-4 mr-2" />
-          Add Chassidic Dates
+          {texts.addChassidDates}
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Select Chassidic Dates</DialogTitle>
+          <DialogTitle className="text-xl">{texts.selectChassidDates}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Choose from important Chassidic dates to add to your calendar:
+            {texts.chooseChassidDates}
           </p>
           
-          <div className="space-y-3">
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
             {CHASSIDIC_DATES.map((date) => (
-              <Card key={date.id} className="shadow-card">
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      id={date.id}
-                      checked={selectedDates.has(date.id)}
-                      onCheckedChange={() => handleDateToggle(date.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div>
-                          <label 
-                            htmlFor={date.id}
-                            className="text-sm font-medium cursor-pointer block"
-                          >
-                            {date.title}
-                          </label>
-                          <p className="text-sm text-muted-foreground font-hebrew text-right" dir="rtl">
-                            {date.hebrewTitle}
-                          </p>
-                        </div>
-                        <Badge variant="secondary" className="shrink-0">
-                          {date.hebrewDate}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {date.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={date.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                <Checkbox
+                  id={date.id}
+                  checked={selectedDates.has(date.id)}
+                  onCheckedChange={() => handleDateToggle(date.id)}
+                />
+                <label 
+                  htmlFor={date.id}
+                  className="flex-1 text-sm font-medium cursor-pointer"
+                >
+                  {date.title}
+                </label>
+              </div>
             ))}
           </div>
 
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-muted-foreground">
-              {selectedDates.size} date{selectedDates.size !== 1 ? 's' : ''} selected
+              {selectedDates.size} {texts.datesSelected}
             </p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                {texts.cancel}
               </Button>
-              <Button onClick={handleAddSelected} className="bg-gradient-primary hover:opacity-90">
+              <Button onClick={handleApplyChanges} className="bg-gradient-primary hover:opacity-90">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Selected ({selectedDates.size})
+                {texts.addSelected} ({selectedDates.size})
               </Button>
             </div>
           </div>

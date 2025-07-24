@@ -3,16 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { DateInfoDialog } from "./DateInfoDialog";
+import { getTexts, Language } from "@/lib/texts";
 
 interface CalendarDate {
   id: string;
   title: string;
   category: "personal" | "chassidic" | "community";
   date: Date;
+  description?: string;
+  hebrewDate?: string;
+  gregorianDate?: string;
 }
 
 interface CalendarViewProps {
   dates: CalendarDate[];
+  language: Language;
 }
 
 const categoryColors = {
@@ -21,8 +27,11 @@ const categoryColors = {
   community: "bg-secondary text-secondary-foreground"
 };
 
-export function CalendarView({ dates }: CalendarViewProps) {
+export function CalendarView({ dates, language }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showDateInfo, setShowDateInfo] = useState(false);
+  const texts = getTexts(language);
   
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -61,43 +70,54 @@ export function CalendarView({ dates }: CalendarViewProps) {
     });
   };
 
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setShowDateInfo(true);
+  };
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const getSelectedDayEvents = () => {
+    if (!selectedDate) return [];
+    return getDatesForDay(selectedDate).map(date => ({
+      id: date.id,
+      title: date.title,
+      category: date.category,
+      description: date.description || "",
+      hebrewDate: date.hebrewDate || "",
+      gregorianDate: date.gregorianDate || date.date.toISOString().split('T')[0]
+    }));
+  };
 
   return (
-    <Card className="shadow-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Calendar View
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <h3 className="text-lg font-semibold min-w-[140px] text-center">
-              {monthNames[month]} {year}
-            </h3>
-            <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {dayNames.map(day => (
-            <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
-              {day}
+    <>
+      <Card className="shadow-card">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              {texts.calendarView}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <h3 className="text-lg font-semibold min-w-[140px] text-center">
+                {texts.months[month]} {year}
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
             </div>
-          ))}
-        </div>
+          </div>
+        </CardHeader>
+      
+        <CardContent>
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {texts.dayNames.map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
+                {day}
+              </div>
+            ))}
+          </div>
         
         <div className="grid grid-cols-7 gap-1">
           {weeks.map((week, weekIndex) =>
@@ -109,11 +129,12 @@ export function CalendarView({ dates }: CalendarViewProps) {
               return (
                 <div
                   key={`${weekIndex}-${dayIndex}`}
+                  onClick={() => handleDayClick(date)}
                   className={`
-                    min-h-[80px] p-1 border border-border rounded-md
+                    min-h-[80px] p-1 border border-border rounded-md cursor-pointer
                     ${isCurrentMonth ? 'bg-background' : 'bg-muted/30'}
                     ${isToday ? 'ring-2 ring-accent shadow-card' : ''}
-                    transition-all hover:bg-muted/50
+                    transition-all hover:bg-muted/50 hover:shadow-md
                   `}
                 >
                   <div className={`
@@ -145,7 +166,16 @@ export function CalendarView({ dates }: CalendarViewProps) {
             })
           )}
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+      
+      <DateInfoDialog
+        open={showDateInfo}
+        onOpenChange={setShowDateInfo}
+        selectedDate={selectedDate}
+        events={getSelectedDayEvents()}
+        language={language}
+      />
+    </>
   );
 }
