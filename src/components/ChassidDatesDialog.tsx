@@ -20,11 +20,11 @@ interface ChassidDatesDialogProps {
   language: Language;
 }
 
-export function ChassidDatesDialog({ 
-  onAddDates, 
-  onRemoveDates, 
-  existingDates, 
-  language 
+export function ChassidDatesDialog({
+  onAddDates,
+  onRemoveDates,
+  existingDates,
+  language
 }: ChassidDatesDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
@@ -41,7 +41,7 @@ export function ChassidDatesDialog({
         return chassidDate?.id;
       })
       .filter(Boolean) as string[];
-    
+
     setSelectedDates(new Set(existingChassidicDates));
   }, [existingDates, open]);
 
@@ -68,7 +68,7 @@ export function ChassidDatesDialog({
     );
 
     // Find dates to add (selected but not existing)
-    const datesToAdd = CHASSIDIC_DATES.filter(date => 
+    const datesToAdd = CHASSIDIC_DATES.filter(date =>
       selectedDates.has(date.id) && !currentChassidicIds.has(date.id)
     );
 
@@ -90,13 +90,6 @@ export function ChassidDatesDialog({
     }
 
     setOpen(false);
-    
-    if (datesToAdd.length > 0 || dateIdsToRemove.length > 0) {
-      toast({
-        title: texts.datesAddedSuccess,
-        description: `Updated ${datesToAdd.length + dateIdsToRemove.length} chassidic dates in your collection.`
-      });
-    }
   };
 
   return (
@@ -107,17 +100,17 @@ export function ChassidDatesDialog({
           {texts.addChassidDates}
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">{texts.selectChassidDates}</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
             {texts.chooseChassidDates}
           </p>
-          
+
           <div className="space-y-2 max-h-[400px] overflow-y-auto">
             {CHASSIDIC_DATES.map((date) => (
               <div key={date.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
@@ -126,7 +119,7 @@ export function ChassidDatesDialog({
                   checked={selectedDates.has(date.id)}
                   onCheckedChange={() => handleDateToggle(date.id)}
                 />
-                <label 
+                <label
                   htmlFor={date.id}
                   className="flex-1 text-sm font-medium cursor-pointer"
                 >

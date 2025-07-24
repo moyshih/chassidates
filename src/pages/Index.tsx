@@ -31,9 +31,9 @@ const Index = () => {
     language: "english",
     isSignedIn: false
   });
-  
+
   const texts = getTexts(settings.language);
-  
+
   const [dates, setDates] = useState<StoredDate[]>([
     {
       id: "1",
@@ -45,7 +45,7 @@ const Index = () => {
       dateObject: new Date("2024-06-12")
     },
     {
-      id: "2", 
+      id: "2",
       title: "Rosh Hashanah",
       hebrewDate: "א' תשרי",
       gregorianDate: "2024-09-16",
@@ -58,12 +58,12 @@ const Index = () => {
       title: "Family Yahrzeit",
       hebrewDate: "כ' אדר",
       gregorianDate: "2024-03-01",
-      category: "personal", 
+      category: "personal",
       description: "In loving memory",
       dateObject: new Date("2024-03-01")
     }
   ]);
-  
+
   const [activeFilter, setActiveFilter] = useState<"all" | "personal" | "chassidic" | "community">("all");
 
   const filteredDates = useMemo(() => {
@@ -90,7 +90,7 @@ const Index = () => {
       });
       return;
     }
-    
+
     const newDate: StoredDate = {
       id: Date.now().toString(),
       ...dateData,
@@ -114,7 +114,7 @@ const Index = () => {
       const demoDate = new Date();
       demoDate.setMonth(Math.floor(Math.random() * 12));
       demoDate.setDate(Math.floor(Math.random() * 28) + 1);
-      
+
       return {
         id: `chassid-${Date.now()}-${Math.random()}`,
         title: date.title,
@@ -125,22 +125,32 @@ const Index = () => {
         dateObject: demoDate
       };
     });
-    
+
     setDates(prev => [...prev, ...newDates]);
+
+    toast({
+      title: texts.datesAddedSuccess,
+      description: `Added ${newDates.length} chassidic dates to your collection.`
+    });
   };
 
   const handleRemoveChassidDates = (dateIds: string[]) => {
     setDates(prev => prev.filter(date => !dateIds.includes(date.id)));
+
+    toast({
+      title: texts.datesRemovedSuccess,
+      description: `Removed ${dateIds.length} chassidic dates from your collection.`
+    });
   };
 
   const handleEditDate = (id: string, editedData: any) => {
-    setDates(prev => prev.map(date => 
-      date.id === id 
-        ? { 
-            ...date, 
-            ...editedData,
-            dateObject: new Date(editedData.gregorianDate)
-          }
+    setDates(prev => prev.map(date =>
+      date.id === id
+        ? {
+          ...date,
+          ...editedData,
+          dateObject: new Date(editedData.gregorianDate)
+        }
         : date
     ));
   };
@@ -148,7 +158,7 @@ const Index = () => {
   const handleDeleteDate = (id: string) => {
     setDates(prev => prev.filter(date => date.id !== id));
     toast({
-      title: "Date removed", 
+      title: "Date removed",
       description: "The date has been removed from your collection."
     });
   };
@@ -165,7 +175,7 @@ const Index = () => {
               {settings.language === "hebrew" ? "מנהל תאריכים חסידיים" : "Chassidic Dates Manager"}
             </h1>
             <p className="text-lg text-muted-foreground">
-              {settings.language === "hebrew" 
+              {settings.language === "hebrew"
                 ? "עקבו אחר תאריכים משמעותיים במסע הרוחני שלכם"
                 : "Keep track of meaningful dates in your spiritual journey"
               }
@@ -192,14 +202,14 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
               <div className="flex gap-2">
                 <AddDateDialog onAddDate={handleAddDate} />
-                <ChassidDatesDialog 
+                <ChassidDatesDialog
                   onAddDates={handleAddChassidDates}
                   onRemoveDates={handleRemoveChassidDates}
                   existingDates={dates}
                   language={settings.language}
                 />
               </div>
-              
+
               <div className="flex gap-4">
                 <Card className="shadow-card">
                   <CardContent className="p-4">
@@ -231,7 +241,7 @@ const Index = () => {
                     <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-medium mb-2">No dates found</h3>
                     <p className="text-muted-foreground mb-4">
-                      {activeFilter === "all" 
+                      {activeFilter === "all"
                         ? "Add your first important date to get started."
                         : `No ${activeFilter} dates found. Try a different filter or add a new date.`
                       }
@@ -251,17 +261,9 @@ const Index = () => {
                         category={date.category}
                         description={date.description}
                         daysUntil={date.daysUntil}
-                        onEdit={() => {}} // Disable card edit button
+                        onEdit={handleEditDate} // Disable card edit button
                         onDelete={handleDeleteDate}
                       />
-                      {date.category === "personal" && (
-                        <div className="flex justify-end">
-                          <EditDateDialog
-                            dateData={date}
-                            onEditDate={handleEditDate}
-                          />
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -270,7 +272,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6">
-            <CalendarView 
+            <CalendarView
               dates={filteredDates.map(date => ({
                 id: date.id,
                 title: date.title,
