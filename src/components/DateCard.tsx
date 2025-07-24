@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EditDateDialog } from "./EditDateDialog";
 
 interface DateCardProps {
   id: string;
@@ -12,7 +13,7 @@ interface DateCardProps {
   category: "personal" | "chassidic" | "community";
   description?: string;
   daysUntil: number;
-  onEdit: (id: string) => void;
+  onEdit: (id: string, editedData: any) => void;
   onDelete: (id: string) => void;
 }
 
@@ -41,7 +42,7 @@ export function DateCard({
 }: DateCardProps) {
   const isToday = daysUntil === 0;
   const isPast = daysUntil < 0;
-  
+
   return (
     <Card className={cn(
       "group transition-all duration-300 hover:shadow-elegant",
@@ -67,12 +68,12 @@ export function DateCard({
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent>
         {description && (
           <p className="text-sm text-muted-foreground mb-3">{description}</p>
         )}
-        
+
         <div className="flex items-center justify-between">
           <div className="text-sm">
             {isToday && (
@@ -89,16 +90,16 @@ export function DateCard({
               </span>
             )}
           </div>
-          
+
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onEdit(id)}
-              className="h-8 w-8 p-0"
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
+            {category !== "chassidic" && (
+              <div className="flex justify-end">
+                <EditDateDialog
+                  dateData={{ id, title, hebrewDate, gregorianDate, category, description }}
+                  onEditDate={onEdit}
+                />
+              </div>
+            )}
             <Button
               size="sm"
               variant="ghost"

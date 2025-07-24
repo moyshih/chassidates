@@ -59,16 +59,20 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-8 w-8 p-0"
+        >
           <Edit className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Date</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="edit-title">Title</Label>
@@ -79,7 +83,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
               placeholder="Enter date title"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="edit-gregorian-date">Date</Label>
             <Input
@@ -89,7 +93,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
               onChange={(e) => handleInputChange("gregorianDate", e.target.value)}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="edit-hebrew-date">Hebrew Date (Optional)</Label>
             <Input
@@ -99,7 +103,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
               placeholder="e.g., ח' חנוכה"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="edit-category">Category</Label>
             <Select value={formData.category} onValueChange={(value: "personal" | "chassidic" | "community") => handleInputChange("category", value)}>
@@ -113,7 +117,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="edit-description">Description (Optional)</Label>
             <Textarea
@@ -124,7 +128,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
               rows={3}
             />
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
