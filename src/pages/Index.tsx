@@ -13,16 +13,7 @@ import { ChassidDate } from "@/data/chassidicDates";
 import { getTexts } from "@/lib/texts";
 import { AllDatesView } from "@/components/AllDatesView";
 import FilterTabs from "@/components/FilterTabs";
-
-export interface DateInfo {
-  id: string;
-  title: string;
-  hebrewDate: string;
-  gregorianDate: string;
-  category: "personal" | "chassidic" | "community";
-  description: string;
-  date: Date;
-}
+import { DateInfo, EventType } from "@/types/eventTypes";
 
 const Index = () => {
   const { toast } = useToast();
@@ -41,7 +32,10 @@ const Index = () => {
       hebrewDate: "ו' סיון",
       gregorianDate: "2024-06-12",
       category: "chassidic",
+      eventType: "pass_away",
       description: "Founder of Chassidism",
+      hasReminder: true,
+      reminderDays: 7,
       date: new Date("2024-06-12")
     },
     {
@@ -50,16 +44,22 @@ const Index = () => {
       hebrewDate: "א' תשרי",
       gregorianDate: "2024-09-16",
       category: "chassidic",
+      eventType: "event",
       description: "Jewish New Year",
+      hasReminder: false,
+      reminderDays: 7,
       date: new Date("2024-09-16")
     },
     {
       id: "3",
-      title: "Family Yahrzeit",
+      title: "Family Anniversary",
       hebrewDate: "כ' אדר",
       gregorianDate: "2024-03-01",
       category: "personal",
-      description: "In loving memory",
+      eventType: "married",
+      description: "Wedding anniversary",
+      hasReminder: true,
+      reminderDays: 14,
       date: new Date("2024-03-01")
     }
   ]);
@@ -130,7 +130,10 @@ const Index = () => {
         hebrewDate: date.hebrewDate,
         gregorianDate: demoDate.toISOString().split('T')[0],
         category: date.category,
+        eventType: "event" as EventType,
         description: date.description,
+        hasReminder: false,
+        reminderDays: 7,
         date: demoDate
       };
     });
@@ -158,7 +161,7 @@ const Index = () => {
         ? {
           ...date,
           ...editedData,
-          dateObject: new Date(editedData.gregorianDate)
+          date: new Date(editedData.gregorianDate)
         }
         : date
     ));
@@ -309,30 +312,17 @@ const Index = () => {
 
           <TabsContent value="calendar" className="space-y-6">
             <CalendarView
-              dates={dates.map(date => ({
-                id: date.id,
-                title: date.title,
-                category: date.category,
-                date: date.date,
-                description: date.description,
-                hebrewDate: date.hebrewDate,
-                gregorianDate: date.gregorianDate
-              }))}
+              dates={dates}
               language={settings.language}
+              onEdit={handleEditDate}
+              onDelete={handleDeleteDate}
+              onAddDate={handleAddDate}
             />
           </TabsContent>
 
           <TabsContent value="dates" className="space-y-6">
             <AllDatesView
-              allDates={dates.map(date => ({
-                id: date.id,
-                title: date.title,
-                category: date.category,
-                date: date.date,
-                description: date.description,
-                hebrewDate: date.hebrewDate,
-                gregorianDate: date.gregorianDate
-              }))}
+              allDates={dates}
               activeFilter={activeFilter}
               handleAddDate={handleAddDate}
               handleEditDate={handleEditDate}

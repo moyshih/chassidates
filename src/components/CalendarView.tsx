@@ -2,23 +2,18 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { DateInfoDialog } from "./DateInfoDialog";
+import { ChevronLeft, ChevronRight, Calendar, Plus } from "lucide-react";
+import { EnhancedDateInfoDialog } from "./EnhancedDateInfoDialog";
+import { AddDateDialog } from "./AddDateDialog";
 import { getTexts, Language } from "@/lib/texts";
-
-interface CalendarDate {
-  id: string;
-  title: string;
-  category: "personal" | "chassidic" | "community";
-  date: Date;
-  description?: string;
-  hebrewDate?: string;
-  gregorianDate?: string;
-}
+import { DateInfo, eventTypeConfig } from "@/types/eventTypes";
 
 interface CalendarViewProps {
-  dates: CalendarDate[];
+  dates: DateInfo[];
   language: Language;
+  onEdit: (id: string, data: any) => void;
+  onDelete: (id: string) => void;
+  onAddDate: (data: any) => void;
 }
 
 const categoryColors = {
@@ -27,7 +22,7 @@ const categoryColors = {
   community: "bg-secondary text-secondary-foreground"
 };
 
-export function CalendarView({ dates, language }: CalendarViewProps) {
+export function CalendarView({ dates, language, onEdit, onDelete, onAddDate }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDateInfo, setShowDateInfo] = useState(false);
@@ -75,16 +70,9 @@ export function CalendarView({ dates, language }: CalendarViewProps) {
     setShowDateInfo(true);
   };
 
-  const getSelectedDayEvents = () => {
+  const getSelectedDayEvents = (): DateInfo[] => {
     if (!selectedDate) return [];
-    return getDatesForDay(selectedDate).map(date => ({
-      id: date.id,
-      title: date.title,
-      category: date.category,
-      description: date.description || "",
-      hebrewDate: date.hebrewDate || "",
-      gregorianDate: date.gregorianDate || date.date.toISOString().split('T')[0]
-    }));
+    return getDatesForDay(selectedDate);
   };
 
   return (
@@ -109,6 +97,7 @@ export function CalendarView({ dates, language }: CalendarViewProps) {
               <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
                 {texts.today}
               </Button>
+              <AddDateDialog onAddDate={onAddDate} />
             </div>
           </div>
         </CardHeader>
@@ -149,15 +138,19 @@ export function CalendarView({ dates, language }: CalendarViewProps) {
                     </div>
 
                     <div className="space-y-1">
-                      {dayDates.slice(0, 2).map(event => (
-                        <Badge
-                          key={event.id}
-                          className={`${categoryColors[event.category]} text-xs px-1 py-0 block truncate`}
-                          title={event.title}
-                        >
-                          {event.title}
-                        </Badge>
-                      ))}
+                      {dayDates.slice(0, 2).map(event => {
+                        const EventIcon = eventTypeConfig[event.eventType].icon;
+                        return (
+                          <Badge
+                            key={event.id}
+                            className={`${categoryColors[event.category]} text-xs px-1 py-0 block truncate flex items-center gap-1`}
+                            title={event.title}
+                          >
+                            <EventIcon className="w-3 h-3" />
+                            {event.title}
+                          </Badge>
+                        );
+                      })}
                       {dayDates.length > 2 && (
                         <div className="text-xs text-muted-foreground">
                           +{dayDates.length - 2} more
@@ -172,12 +165,15 @@ export function CalendarView({ dates, language }: CalendarViewProps) {
         </CardContent>
       </Card>
 
-      <DateInfoDialog
+      <EnhancedDateInfoDialog
         open={showDateInfo}
         onOpenChange={setShowDateInfo}
         selectedDate={selectedDate}
         events={getSelectedDayEvents()}
         language={language}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onAddDate={onAddDate}
       />
     </>
   );

@@ -95,7 +95,7 @@ export function DateCard({
             {category !== "chassidic" && (
               <div className="flex justify-end">
                 <EditDateDialog
-                  dateData={{ id, title, hebrewDate, gregorianDate, category, description }}
+                  dateData={{ id, title, hebrewDate, gregorianDate: gregorianDate.toISOString().split('T')[0], category, description }}
                   onEditDate={onEdit}
                 />
               </div>

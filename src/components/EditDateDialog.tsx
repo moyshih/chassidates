@@ -11,13 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 interface EditDateData {
   title: string;
   hebrewDate: string;
-  gregorianDate: Date;
+  gregorianDate: string;
   category: "personal" | "chassidic" | "community";
   description: string;
 }
 
 interface EditDateDialogProps {
-  dateData: EditDateData & { id: string };
+  dateData: any & { id: string };
   onEditDate: (id: string, data: EditDateData) => void;
 }
 
@@ -26,9 +26,9 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
   const [formData, setFormData] = useState<EditDateData>({
     title: dateData.title,
     hebrewDate: dateData.hebrewDate,
-    gregorianDate: dateData.gregorianDate,
+    gregorianDate: typeof dateData.gregorianDate === 'string' ? dateData.gregorianDate : new Date(dateData.gregorianDate).toISOString().split('T')[0],
     category: dateData.category,
-    description: dateData.description
+    description: dateData.description || ""
   });
   const { toast } = useToast();
 
@@ -57,7 +57,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
   };
 
   const handleDateInputChange = (field: keyof EditDateData, date: string) => {
-    setFormData(prev => ({ ...prev, [field]: new Date(date) }));
+    setFormData(prev => ({ ...prev, [field]: date }));
   };
 
   return (
@@ -93,7 +93,7 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
             <Input
               id="edit-gregorian-date"
               type="date"
-              value={formData.gregorianDate.toISOString().split("T")[0]}
+              value={formData.gregorianDate}
               onChange={(e) => handleDateInputChange("gregorianDate", e.target.value)}
             />
           </div>

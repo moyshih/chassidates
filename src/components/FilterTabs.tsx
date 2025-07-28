@@ -2,7 +2,7 @@ import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, User, Calendar } from "lucide-react";
-import { DateInfo } from "@/pages/Index";
+import { DateInfo } from "@/types/eventTypes";
 
 interface FilterTabsProps {
   activeFilter: "all" | "personal" | "chassidic" | "community";
