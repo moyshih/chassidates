@@ -33,7 +33,7 @@ export function AddDateDialog({ onAddDate }: AddDateDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.gregorianDate) {
       toast({
         title: "Missing information",
@@ -52,7 +52,7 @@ export function AddDateDialog({ onAddDate }: AddDateDialogProps) {
       description: ""
     });
     setOpen(false);
-    
+
     toast({
       title: "Date added successfully",
       description: `${formData.title} has been added to your dates.`
@@ -66,17 +66,17 @@ export function AddDateDialog({ onAddDate }: AddDateDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-primary hover:opacity-90 shadow-elegant">
-          <Plus className="w-4 h-4 mr-2" />
+        <Button className="bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+          <Plus className="w-5 h-5 mr-2" />
           Add Date
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl">Add Important Date</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Event Name</Label>
@@ -100,7 +100,7 @@ export function AddDateDialog({ onAddDate }: AddDateDialogProps) {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="hebrewDate">Hebrew Date (Optional)</Label>
               <Input

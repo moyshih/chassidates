@@ -3,23 +3,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateCard } from "@/components/DateCard";
 import { AddDateDialog } from "@/components/AddDateDialog";
-import { ChassidDatesDialog } from "@/components/ChassidDatesDialog";
+import { AddChassidicDatesDialog } from "@/components/ChassidDatesDialog";
 import { SettingsDialog, SettingsState } from "@/components/SettingsDialog";
 import { FilterBar } from "@/components/FilterBar";
 import { CalendarView } from "@/components/CalendarView";
-import { Star, Calendar, Clock } from "lucide-react";
+import { Star, Calendar, Clock, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ChassidDate } from "@/data/chassidicDates";
 import { getTexts } from "@/lib/texts";
+import { AllDatesView } from "@/components/AllDatesView";
+import FilterTabs from "@/components/FilterTabs";
 
-interface StoredDate {
+export interface DateInfo {
   id: string;
   title: string;
   hebrewDate: string;
   gregorianDate: string;
   category: "personal" | "chassidic" | "community";
   description: string;
-  dateObject: Date;
+  date: Date;
 }
 
 const Index = () => {
@@ -32,7 +34,7 @@ const Index = () => {
 
   const texts = getTexts(settings.language);
 
-  const [dates, setDates] = useState<StoredDate[]>([
+  const [dates, setDates] = useState<DateInfo[]>([
     {
       id: "1",
       title: "Yahrzeit of the Baal Shem Tov",
@@ -40,7 +42,7 @@ const Index = () => {
       gregorianDate: "2024-06-12",
       category: "chassidic",
       description: "Founder of Chassidism",
-      dateObject: new Date("2024-06-12")
+      date: new Date("2024-06-12")
     },
     {
       id: "2",
@@ -49,7 +51,7 @@ const Index = () => {
       gregorianDate: "2024-09-16",
       category: "chassidic",
       description: "Jewish New Year",
-      dateObject: new Date("2024-09-16")
+      date: new Date("2024-09-16")
     },
     {
       id: "3",
@@ -58,26 +60,35 @@ const Index = () => {
       gregorianDate: "2024-03-01",
       category: "personal",
       description: "In loving memory",
-      dateObject: new Date("2024-03-01")
+      date: new Date("2024-03-01")
     }
   ]);
 
   const [activeFilter, setActiveFilter] = useState<"all" | "personal" | "chassidic" | "community">("all");
 
-  const filteredDates = useMemo(() => {
-    return dates.filter(date => activeFilter === "all" || date.category === activeFilter);
-  }, [dates, activeFilter]);
-
   const upcomingDates = useMemo(() => {
     const now = new Date();
-    return filteredDates
-      .map(date => ({
-        ...date,
-        daysUntil: Math.ceil((date.dateObject.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-      }))
+    return dates
+      .map(date => {
+        const daysUntil = Math.ceil((date.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        const isMonthAway = daysUntil > 30;
+        const hasPassed = daysUntil < 0;
+
+        if (hasPassed) return null;
+        if (isMonthAway) return null;
+
+        return {
+          ...date,
+          daysUntil: daysUntil
+        }
+      })?.filter(Boolean) // Remove null values
       .sort((a, b) => Math.abs(a.daysUntil) - Math.abs(b.daysUntil))
-      .slice(0, 6);
-  }, [filteredDates]);
+      .slice(0, 10);
+  }, [dates]);
+
+  const filteredDates = useMemo(() => {
+    return upcomingDates?.filter(date => activeFilter === "all" || date.category === activeFilter);
+  }, [upcomingDates, activeFilter]);
 
   const handleAddDate = (dateData: any) => {
     if (!settings.isSignedIn) {
@@ -89,10 +100,10 @@ const Index = () => {
       return;
     }
 
-    const newDate: StoredDate = {
+    const newDate: DateInfo = {
       id: Date.now().toString(),
       ...dateData,
-      dateObject: new Date(dateData.gregorianDate)
+      date: new Date(dateData.gregorianDate)
     };
     setDates(prev => [...prev, newDate]);
   };
@@ -107,7 +118,7 @@ const Index = () => {
       return;
     }
 
-    const newDates: StoredDate[] = chassidDates.map(date => {
+    const newDates: DateInfo[] = chassidDates.map(date => {
       // For demo purposes, using current year. In real app, would convert Hebrew to Gregorian properly
       const demoDate = new Date();
       demoDate.setMonth(Math.floor(Math.random() * 12));
@@ -120,7 +131,7 @@ const Index = () => {
         gregorianDate: demoDate.toISOString().split('T')[0],
         category: date.category,
         description: date.description,
-        dateObject: demoDate
+        date: demoDate
       };
     });
 
@@ -184,14 +195,18 @@ const Index = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px] lg:mx-auto">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[700px] lg:mx-auto">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
+              <Home className="w-4 h-4" />
               Dashboard
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Calendar
+            </TabsTrigger>
+            <TabsTrigger value="dates" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Dates
             </TabsTrigger>
           </TabsList>
 
@@ -200,7 +215,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
               <div className="flex gap-2">
                 <AddDateDialog onAddDate={handleAddDate} />
-                <ChassidDatesDialog
+                <AddChassidicDatesDialog
                   onAddDates={handleAddChassidDates}
                   onRemoveDates={handleRemoveChassidDates}
                   existingDates={dates}
@@ -208,7 +223,7 @@ const Index = () => {
                 />
               </div>
 
-              <div className="flex gap-4">
+              {/* <div className="flex gap-4">
                 <Card className="shadow-card">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
@@ -220,62 +235,85 @@ const Index = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </div> */}
             </div>
 
-            {/* Filter Bar */}
-            <FilterBar
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-              dateCount={filteredDates.length}
-            />
-
             {/* Upcoming Dates */}
+
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Upcoming Dates</h2>
-              {upcomingDates.length === 0 ? (
-                <Card className="shadow-card">
-                  <CardContent className="p-8 text-center">
-                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No dates found</h3>
-                    <p className="text-muted-foreground mb-4">
-                      {activeFilter === "all"
-                        ? "Add your first important date to get started."
-                        : `No ${activeFilter} dates found. Try a different filter or add a new date.`
-                      }
-                    </p>
-                    <AddDateDialog onAddDate={handleAddDate} />
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {upcomingDates.map((date) => (
-                    <div key={date.id} className="space-y-2">
-                      <DateCard
-                        id={date.id}
-                        title={date.title}
-                        hebrewDate={date.hebrewDate}
-                        gregorianDate={date.dateObject}
-                        category={date.category}
-                        description={date.description}
-                        daysUntil={date.daysUntil}
-                        onEdit={handleEditDate} // Disable card edit button
-                        onDelete={handleDeleteDate}
-                      />
+              <Card className="glass-effect shadow-lg">
+                <CardHeader className="pb-4">
+                  <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-amber-500" />
+                    Upcoming Dates
+                  </h3>
+                </CardHeader>
+                <CardContent>
+
+                  {/* Filter Bar */}
+                  <FilterTabs
+                    activeFilter={activeFilter}
+                    onFilterChange={setActiveFilter}
+                    dates={upcomingDates}
+                  />
+
+                  {/* <FilterBar
+                    activeFilter={activeFilter}
+                    onFilterChange={setActiveFilter}
+                    dateCount={filteredDates.length}
+                  />
+ */}
+                  {filteredDates.length === 0 ? (
+                    <Card className="shadow-card">
+                      <CardContent className="p-8 text-center">
+                        <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium mb-2">
+                          {activeFilter === "all"
+                            ? "No upcoming dates in the next 30 days."
+                            : `No ${activeFilter} dates in the next 30 days`
+                          }
+                        </h3>
+                        <p className="text-muted-foreground mb-4">
+                          {activeFilter === "all"
+                            ? "Add a new date to get started."
+                            : `Try a different filter or add a new date.`
+                          }
+                        </p>
+                        <AddDateDialog onAddDate={handleAddDate} />
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {upcomingDates.map((date) => (
+                        <div key={date.id} className="space-y-2">
+                          <DateCard
+                            id={date.id}
+                            title={date.title}
+                            hebrewDate={date.hebrewDate}
+                            gregorianDate={date.date}
+                            category={date.category}
+                            description={date.description}
+                            daysUntil={date.daysUntil}
+                            onEdit={handleEditDate} // Disable card edit button
+                            onDelete={handleDeleteDate}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  )}
+                </CardContent>
+              </Card>
+
             </div>
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6">
             <CalendarView
-              dates={filteredDates.map(date => ({
+              dates={dates.map(date => ({
                 id: date.id,
                 title: date.title,
                 category: date.category,
-                date: date.dateObject,
+                date: date.date,
                 description: date.description,
                 hebrewDate: date.hebrewDate,
                 gregorianDate: date.gregorianDate
@@ -283,9 +321,27 @@ const Index = () => {
               language={settings.language}
             />
           </TabsContent>
+
+          <TabsContent value="dates" className="space-y-6">
+            <AllDatesView
+              allDates={dates.map(date => ({
+                id: date.id,
+                title: date.title,
+                category: date.category,
+                date: date.date,
+                description: date.description,
+                hebrewDate: date.hebrewDate,
+                gregorianDate: date.gregorianDate
+              }))}
+              activeFilter={activeFilter}
+              handleAddDate={handleAddDate}
+              handleEditDate={handleEditDate}
+              handleDeleteDate={handleDeleteDate}
+            />
+          </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -20,7 +20,7 @@ interface ChassidDatesDialogProps {
   language: Language;
 }
 
-export function ChassidDatesDialog({
+export function AddChassidicDatesDialog({
   onAddDates,
   onRemoveDates,
   existingDates,
@@ -137,7 +137,7 @@ export function ChassidDatesDialog({
               <Button variant="outline" onClick={() => setOpen(false)}>
                 {texts.cancel}
               </Button>
-              <Button onClick={handleApplyChanges} className="bg-gradient-primary hover:opacity-90">
+              <Button onClick={handleApplyChanges} className="bg-amber-600 hover:bg-amber-700 hover:opacity-90">
                 <Plus className="w-4 h-4 mr-2" />
                 {texts.addSelected} ({selectedDates.size})
               </Button>
