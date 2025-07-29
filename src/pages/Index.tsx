@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateCard } from "@/components/DateCard";
@@ -9,19 +9,30 @@ import { FilterBar } from "@/components/FilterBar";
 import { CalendarView } from "@/components/CalendarView";
 import { Star, Calendar, Clock, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { ChassidDate } from "@/data/chassidicDates";
 import { getTexts } from "@/lib/texts";
 import { AllDatesView } from "@/components/AllDatesView";
 import FilterTabs from "@/components/FilterTabs";
+import { SignInButton } from "@/components/SignInButton";
 import { DateInfo, EventType } from "@/types/eventTypes";
 
 const Index = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<SettingsState>({
     calendarType: "gregorian",
     language: "english",
-    isSignedIn: false
+    isSignedIn: !!user
   });
+
+  // Update settings when user authentication state changes
+  useEffect(() => {
+    setSettings(prev => ({
+      ...prev,
+      isSignedIn: !!user
+    }));
+  }, [user]);
 
   const texts = getTexts(settings.language);
 
@@ -91,7 +102,7 @@ const Index = () => {
   }, [upcomingDates, activeFilter]);
 
   const handleAddDate = (dateData: any) => {
-    if (!settings.isSignedIn) {
+    if (!user) {
       toast({
         title: "Sign in required",
         description: "Please sign in to add dates to your collection.",
@@ -109,7 +120,7 @@ const Index = () => {
   };
 
   const handleAddChassidDates = (chassidDates: ChassidDate[]) => {
-    if (!settings.isSignedIn) {
+    if (!user) {
       toast({
         title: "Sign in required",
         description: "Please sign in to add dates to your collection.",
@@ -193,7 +204,10 @@ const Index = () => {
               }
             </p>
           </div>
-          <SettingsDialog settings={settings} onSettingsChange={setSettings} />
+          <div className="flex items-center gap-4">
+            <SignInButton />
+            <SettingsDialog settings={settings} onSettingsChange={setSettings} />
+          </div>
         </div>
 
         {/* Main Content */}

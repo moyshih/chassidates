@@ -53,7 +53,7 @@ export function SettingsDialog({ settings, onSettingsChange }: SettingsDialogPro
           <Settings className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
@@ -61,7 +61,7 @@ export function SettingsDialog({ settings, onSettingsChange }: SettingsDialogPro
             Settings
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           {/* Theme Settings */}
           <Card>
