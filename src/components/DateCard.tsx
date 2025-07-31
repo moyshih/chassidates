@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { EditDateDialog } from "./EditDateDialog";
+import { EditEventDialog } from "./EditDateDialog";
 
-interface DateCardProps {
+interface EventCardProps {
   id: string;
   title: string;
   hebrewDate: string;
@@ -18,9 +18,9 @@ interface DateCardProps {
 }
 
 const categoryColors = {
-  personal: "bg-primary text-primary-foreground",
-  chassidic: "bg-accent text-accent-foreground",
-  community: "bg-secondary text-secondary-foreground"
+  personal: "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700",
+  chassidic: "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700",
+  community: "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700"
 };
 
 const categoryLabels = {
@@ -29,7 +29,7 @@ const categoryLabels = {
   community: "Community"
 };
 
-export function DateCard({
+export function EventCard({
   id,
   title,
   hebrewDate,
@@ -39,14 +39,14 @@ export function DateCard({
   daysUntil,
   onEdit,
   onDelete
-}: DateCardProps) {
+}: EventCardProps) {
   const isToday = daysUntil === 0;
   const isPast = daysUntil < 0;
 
   return (
     <Card className={cn(
-      "group transition-all duration-300 hover:shadow-elegant",
-      isToday && "ring-2 ring-accent shadow-elegant"
+      "group transition-all duration-300 hover:shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl",
+      isToday && "ring-2 ring-amber-300 dark:ring-amber-600 shadow-xl"
     )}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
@@ -77,7 +77,7 @@ export function DateCard({
         <div className="flex items-center justify-between">
           <div className="text-sm">
             {isToday && (
-              <span className="text-accent font-medium">Today!</span>
+              <span className="text-amber-600 dark:text-amber-400 font-medium">Today!</span>
             )}
             {daysUntil > 0 && (
               <span className="text-muted-foreground">
@@ -91,12 +91,12 @@ export function DateCard({
             )}
           </div>
 
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-1">
             {category !== "chassidic" && (
               <div className="flex justify-end">
-                <EditDateDialog
-                  dateData={{ id, title, hebrewDate, gregorianDate: gregorianDate.toISOString().split('T')[0], category, description }}
-                  onEditDate={onEdit}
+                <EditEventDialog
+                  eventData={{ id, title, hebrewDate, gregorianDate: gregorianDate.toISOString().split('T')[0], category, description }}
+                  onEditEvent={onEdit}
                 />
               </div>
             )}

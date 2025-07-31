@@ -45,8 +45,8 @@ export interface TextKeys {
   // Toast messages
   signInRequired: string;
   signInToAdd: string;
-  datesAddedSuccess: string;
-  datesRemovedSuccess: string;
+  eventsAddedSuccess: string;
+  eventsRemovedSuccess: string;
   dateRemoved: string;
   dateRemovedDesc: string;
   noDatesSelectedTitle: string;
@@ -109,8 +109,8 @@ const englishTexts: TextKeys = {
   // Toast messages
   signInRequired: "Sign in required",
   signInToAdd: "Please sign in to add dates to your collection.",
-  datesAddedSuccess: "Dates added successfully",
-  datesRemovedSuccess: "Dates removed successfully",
+  eventsAddedSuccess: "Dates added successfully",
+  eventsRemovedSuccess: "Dates removed successfully",
   dateRemoved: "Date removed",
   dateRemovedDesc: "The date has been removed from your collection.",
   noDatesSelectedTitle: "No dates selected",
@@ -176,8 +176,8 @@ const hebrewTexts: TextKeys = {
   // Toast messages
   signInRequired: "נדרשת התחברות",
   signInToAdd: "אנא התחברו כדי להוסיף תאריכים לאוסף שלכם.",
-  datesAddedSuccess: "התאריכים נוספו בהצלחה",
-  datesRemovedSuccess: "התאריכים הוסרו בהצלחה",
+  eventsAddedSuccess: "התאריכים נוספו בהצלחה",
+  eventsRemovedSuccess: "התאריכים הוסרו בהצלחה",
   dateRemoved: "התאריך הוסר",
   dateRemovedDesc: "התאריך הוסר מהאוסף שלכם.",
   noDatesSelectedTitle: "לא נבחרו תאריכים",

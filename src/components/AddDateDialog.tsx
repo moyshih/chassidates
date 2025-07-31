@@ -21,12 +21,13 @@ interface DateData {
   reminderDays: number;
 }
 
-interface AddDateDialogProps {
-  onAddDate: (date: DateData) => void;
+interface AddEventDialogProps {
+  onAddEvent: (date: DateData) => void;
   prefilledDate?: string;
+  iconOnly?: boolean;
 }
 
-export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) {
+export function AddEventDialog({ onAddEvent: onAddEvent, prefilledDate, iconOnly = false }: AddEventDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<DateData>({
     title: "",
@@ -52,7 +53,7 @@ export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) 
       return;
     }
 
-    onAddDate(formData);
+    onAddEvent(formData);
     setFormData({
       title: "",
       hebrewDate: "",
@@ -66,8 +67,8 @@ export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) 
     setOpen(false);
 
     toast({
-      title: "Date added successfully",
-      description: `${formData.title} has been added to your dates.`
+      title: "Event added successfully",
+      description: `${formData.title} has been added to your events.`
     });
   };
 
@@ -78,15 +79,15 @@ export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-          <Plus className="w-5 h-5 mr-2" />
-          Add Date
+        <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+          <Plus className="w-5 h-5" />
+          {!iconOnly && "Add Event"}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add Important Date</DialogTitle>
+          <DialogTitle className="text-xl">Add Important Event</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +102,7 @@ export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="gregorianDate">Gregorian Date</Label>
               <Input
@@ -126,7 +127,7 @@ export function AddDateDialog({ onAddDate, prefilledDate }: AddDateDialogProps) 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select value={formData.category} onValueChange={(value: any) => handleInputChange("category", value)}>

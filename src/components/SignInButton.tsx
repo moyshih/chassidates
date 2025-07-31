@@ -28,7 +28,7 @@ export const SignInButton = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+                     <Button size="sm" variant="outline" className="border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
             <Avatar className="w-6 h-6">
               <AvatarImage src={user.photoURL || undefined} alt={user.displayName || "User"} />
               <AvatarFallback>
@@ -56,7 +56,7 @@ export const SignInButton = () => {
   }
 
   return (
-    <Button onClick={signIn} variant="outline" size="sm" className="flex items-center gap-2">
+         <Button onClick={signIn} size="sm" variant="outline" className="border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
       <svg className="w-4 h-4" viewBox="0 0 24 24">
         <path
           fill="currentColor"

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Calendar, Plus } from "lucide-react";
 import { EnhancedDateInfoDialog } from "./EnhancedDateInfoDialog";
-import { AddDateDialog } from "./AddDateDialog";
+import { AddEventDialog } from "./AddDateDialog";
 import { getTexts, Language } from "@/lib/texts";
 import { DateInfo, eventTypeConfig } from "@/types/eventTypes";
 
@@ -80,15 +80,12 @@ export function CalendarView({ dates, language, onEdit, onDelete, onAddDate }: C
       <Card className="shadow-card">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              {/* {texts.calendarView} */}
-            </CardTitle>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <h3 className="text-lg font-semibold min-w-[140px] text-center">
+
                 {texts.months[month]} {year}
               </h3>
               <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
@@ -97,7 +94,6 @@ export function CalendarView({ dates, language, onEdit, onDelete, onAddDate }: C
               <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
                 {texts.today}
               </Button>
-              <AddDateDialog onAddDate={onAddDate} />
             </div>
           </div>
         </CardHeader>

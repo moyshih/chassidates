@@ -95,16 +95,21 @@ export function AddChassidicDatesDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-gradient-accent hover:opacity-90">
-          <BookOpen className="w-4 h-4 mr-2" />
-          {texts.addChassidDates}
-        </Button>
+                          <Button className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 w-full sm:w-auto">
+           <BookOpen className="w-4 h-4 mr-2" />
+           {texts.addChassidDates}
+         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{texts.selectChassidDates}</DialogTitle>
-        </DialogHeader>
+                 <DialogHeader>
+           <DialogTitle className="text-xl text-gray-900 dark:text-gray-100 flex items-center gap-2">
+             <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+               <BookOpen className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+             </div>
+             {texts.selectChassidDates}
+           </DialogTitle>
+         </DialogHeader>
 
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -134,13 +139,13 @@ export function AddChassidicDatesDialog({
               {selectedDates.size} {texts.datesSelected}
             </p>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setOpen(false)}>
-                {texts.cancel}
-              </Button>
-              <Button onClick={handleApplyChanges} className="bg-amber-600 hover:bg-amber-700 hover:opacity-90">
-                <Plus className="w-4 h-4 mr-2" />
-                {texts.addSelected} ({selectedDates.size})
-              </Button>
+                             <Button variant="outline" onClick={() => setOpen(false)} className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                 {texts.cancel}
+               </Button>
+               <Button onClick={handleApplyChanges} className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300">
+                 <Plus className="w-4 h-4 mr-2" />
+                 {texts.addSelected} ({selectedDates.size})
+               </Button>
             </div>
           </div>
         </div>

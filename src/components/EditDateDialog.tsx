@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface EditDateData {
+interface EditEventData {
   title: string;
   hebrewDate: string;
   gregorianDate: string;
@@ -16,19 +16,19 @@ interface EditDateData {
   description: string;
 }
 
-interface EditDateDialogProps {
-  dateData: any & { id: string };
-  onEditDate: (id: string, data: EditDateData) => void;
+interface EditEventDialogProps {
+  eventData: any & { id: string };
+  onEditEvent: (id: string, data: EditEventData) => void;
 }
 
-export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
+export function EditEventDialog({ eventData: eventData, onEditEvent: onEditEvent }: EditEventDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<EditDateData>({
-    title: dateData.title,
-    hebrewDate: dateData.hebrewDate,
-    gregorianDate: typeof dateData.gregorianDate === 'string' ? dateData.gregorianDate : new Date(dateData.gregorianDate).toISOString().split('T')[0],
-    category: dateData.category,
-    description: dateData.description || ""
+  const [formData, setFormData] = useState<EditEventData>({
+    title: eventData.title,
+    hebrewDate: eventData.hebrewDate,
+    gregorianDate: typeof eventData.gregorianDate === 'string' ? eventData.gregorianDate : new Date(eventData.gregorianDate).toISOString().split('T')[0],
+    category: eventData.category,
+    description: eventData.description || ""
   });
   const { toast } = useToast();
 
@@ -44,100 +44,111 @@ export function EditDateDialog({ dateData, onEditDate }: EditDateDialogProps) {
       return;
     }
 
-    onEditDate(dateData.id, formData);
+    onEditEvent(eventData.id, formData);
     setOpen(false);
     toast({
-      title: "Date updated",
-      description: "Your date has been updated successfully."
+      title: "Event updated",
+      description: "Your event has been updated successfully."
     });
   };
 
-  const handleInputChange = (field: keyof EditDateData, value: string) => {
+  const handleInputChange = (field: keyof EditEventData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDateInputChange = (field: keyof EditDateData, date: string) => {
-    setFormData(prev => ({ ...prev, [field]: date }));
+  const handleDateInputChange = (field: keyof EditEventData, event: string) => {
+    setFormData(prev => ({ ...prev, [field]: event }));
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-8 w-8 p-0"
-        >
-          <Edit className="w-4 h-4" />
-        </Button>
+                 <Button
+           size="sm"
+           variant="ghost"
+           className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-gray-200"
+         >
+           <Edit className="w-4 h-4" />
+         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Date</DialogTitle>
+                     <DialogTitle className="text-xl text-gray-900 dark:text-gray-100 flex items-center gap-2">
+             <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+               <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+             </div>
+             Edit Event
+           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="edit-title">Title</Label>
-            <Input
-              id="edit-title"
-              value={formData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Enter date title"
-            />
+                         <Input
+               id="edit-title"
+               value={formData.title}
+               onChange={(e) => handleInputChange("title", e.target.value)}
+               placeholder="Enter event title"
+               className="border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 focus:ring-gray-500/20"
+             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="edit-gregorian-date">Date</Label>
-            <Input
-              id="edit-gregorian-date"
-              type="date"
-              value={formData.gregorianDate}
-              onChange={(e) => handleDateInputChange("gregorianDate", e.target.value)}
-            />
+                         <Input
+               id="edit-gregorian-date"
+               type="date"
+               value={formData.gregorianDate}
+               onChange={(e) => handleDateInputChange("gregorianDate", e.target.value)}
+               className="border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 focus:ring-gray-500/20"
+             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="edit-hebrew-date">Hebrew Date (Optional)</Label>
-            <Input
-              id="edit-hebrew-date"
-              value={formData.hebrewDate}
-              onChange={(e) => handleInputChange("hebrewDate", e.target.value)}
-              placeholder="e.g., ח' חנוכה"
-            />
+                         <Input
+               id="edit-hebrew-date"
+               value={formData.hebrewDate}
+               onChange={(e) => handleInputChange("hebrewDate", e.target.value)}
+               placeholder="e.g., ח' חנוכה"
+               className="border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 focus:ring-gray-500/20"
+             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="edit-category">Category</Label>
-            <Select value={formData.category} onValueChange={(value: "personal" | "chassidic" | "community") => handleInputChange("category", value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="personal">Personal</SelectItem>
-                <SelectItem value="chassidic">Chassidic</SelectItem>
-                <SelectItem value="community">Community</SelectItem>
-              </SelectContent>
-            </Select>
+                         <Select value={formData.category} onValueChange={(value: "personal" | "chassidic" | "community") => handleInputChange("category", value)}>
+               <SelectTrigger className="border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 focus:ring-gray-500/20">
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="personal">Personal</SelectItem>
+                 <SelectItem value="chassidic">Chassidic</SelectItem>
+                 <SelectItem value="community">Community</SelectItem>
+               </SelectContent>
+             </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="edit-description">Description (Optional)</Label>
-            <Textarea
-              id="edit-description"
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Enter description"
-              rows={3}
-            />
+                         <Textarea
+               id="edit-description"
+               value={formData.description}
+               onChange={(e) => handleInputChange("description", e.target.value)}
+               placeholder="Enter description"
+               rows={3}
+               className="border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 focus:ring-gray-500/20"
+             />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Update Date</Button>
+                         <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+               Cancel
+             </Button>
+             <Button type="submit" className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300">
+               Update Event
+             </Button>
           </div>
         </form>
       </DialogContent>

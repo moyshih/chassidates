@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, Edit, Trash2, Plus, Bell } from "lucide-react";
 import { getTexts, Language } from "@/lib/texts";
 import { eventTypeConfig, DateInfo } from "@/types/eventTypes";
-import { EditDateDialog } from "./EditDateDialog";
-import { AddDateDialog } from "./AddDateDialog";
+import { EditEventDialog } from "./EditDateDialog";
+import { AddEventDialog } from "./AddDateDialog";
 
 interface EnhancedDateInfoDialogProps {
   open: boolean;
@@ -72,12 +72,12 @@ export function EnhancedDateInfoDialog({
               <Calendar className="w-5 h-5" />
               {selectedDate ? formatDate(selectedDate) : texts.clickDayToSeeEvents}
             </DialogTitle>
-            {selectedDate && (
+            {/* {selectedDate && (
               <AddDateDialog 
                 onAddDate={onAddDate}
                 prefilledDate={selectedDate.toISOString().split('T')[0]}
               />
-            )}
+            )} */}
           </div>
         </DialogHeader>
         
@@ -95,8 +95,8 @@ export function EnhancedDateInfoDialog({
               <p className="text-muted-foreground mb-4">
                 {texts.noEventsForDay}
               </p>
-              <AddDateDialog 
-                onAddDate={onAddDate}
+              <AddEventDialog 
+                onAddEvent={onAddDate}
                 prefilledDate={selectedDate.toISOString().split('T')[0]}
               />
             </div>
@@ -146,9 +146,9 @@ export function EnhancedDateInfoDialog({
                         
                         <div className="flex gap-1">
                           {event.category !== "chassidic" && (
-                            <EditDateDialog
-                              dateData={event}
-                              onEditDate={onEdit}
+                            <EditEventDialog
+                              eventData={event}
+                              onEditEvent={onEdit}
                             />
                           )}
                           <Button
