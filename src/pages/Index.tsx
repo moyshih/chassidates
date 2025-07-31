@@ -192,19 +192,19 @@ const Index = () => {
     <div className={`min-h-screen bg-gradient-background ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="text-center flex-1">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+          <div className="text-center flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
               {settings.language === "hebrew" ? "מנהל תאריכים חסידיים" : "Chassidic Dates Manager"}
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               {settings.language === "hebrew"
                 ? "עקבו אחר תאריכים משמעותיים במסע הרוחני שלכם"
                 : "Keep track of meaningful dates in your spiritual journey"
               }
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <SignInButton />
             <SettingsDialog settings={settings} onSettingsChange={setSettings} />
           </div>

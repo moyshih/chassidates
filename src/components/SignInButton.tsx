@@ -11,15 +11,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const SignInButton = () => {
   const { user, loading, signIn, signOut } = useAuth();
+  const isMobile = useIsMobile();
 
   if (loading) {
     return (
-      <Button disabled variant="outline" size="sm">
-        <LoadingSpinner size={16} className="mr-2" />
-        Loading...
+      <Button disabled variant="outline" size="sm" className="min-w-0">
+        <LoadingSpinner size={16} className="mr-2 rtl:mr-0 rtl:ml-2" />
+        <span className="hidden sm:inline">Loading...</span>
+        <span className="sm:hidden">...</span>
       </Button>
     );
   }
@@ -28,26 +31,33 @@ export const SignInButton = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <Avatar className="w-6 h-6">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-none"
+          >
+            <Avatar className="w-6 h-6 flex-shrink-0">
               <AvatarImage src={user.photoURL || undefined} alt={user.displayName || "User"} />
               <AvatarFallback>
                 <User className="w-3 h-3" />
               </AvatarFallback>
             </Avatar>
-            <span className="hidden sm:inline">{user.displayName}</span>
+            <span className="hidden sm:inline truncate">{user.displayName}</span>
+            <span className="sm:hidden truncate">
+              {user.displayName?.split(' ')[0] || 'User'}
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.displayName}</p>
-              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+              <p className="text-sm font-medium leading-none truncate">{user.displayName}</p>
+              <p className="text-xs leading-none text-muted-foreground truncate">{user.email}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-red-600">
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
             <span>Sign out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -56,8 +66,13 @@ export const SignInButton = () => {
   }
 
   return (
-    <Button onClick={signIn} variant="outline" size="sm" className="flex items-center gap-2">
-      <svg className="w-4 h-4" viewBox="0 0 24 24">
+    <Button 
+      onClick={signIn} 
+      variant="outline" 
+      size="sm" 
+      className="flex items-center gap-2 min-w-0"
+    >
+      <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
         <path
           fill="currentColor"
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -75,7 +90,8 @@ export const SignInButton = () => {
           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         />
       </svg>
-      <span>Sign in with Google</span>
+      <span className="hidden sm:inline">Sign in with Google</span>
+      <span className="sm:hidden">Sign in</span>
     </Button>
   );
 }; 
